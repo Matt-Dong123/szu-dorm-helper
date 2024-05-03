@@ -41,7 +41,7 @@ def main():
     # 在控制台格式化输出爬虫获得的数据
     printData(data)
 
-    if (email_config['send_email'] == True):
+    if email_config['send_email']:
         sc_sender.email_handle(email_config, data)
         print('[已发送至邮箱]')
 
@@ -114,5 +114,5 @@ def printData(data: list):
 
 
 if __name__ == '__main__':
-    while (True):
+    while True:
         main()

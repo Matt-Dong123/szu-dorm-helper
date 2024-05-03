@@ -1,6 +1,5 @@
 import os
 import smtplib
-import time
 from email.mime.text import MIMEText
 
 import requests
@@ -18,17 +17,7 @@ def send(key_url: str, data: list):
 
 
 def handle(data: list, describe: str):
-    # 标题
-    cur_date = time.strftime("%Y-%m-%d", time.localtime())
     text = '昨日用电{:.2f}度，剩余可用{:.2f}度'.format(data[-2]['cost'], data[-1]['rest'])
-    # if data[-1]['date'] == cur_date:
-    #     text = '昨日用电{:.2f}度，今日可用{:.2f}度'.format(
-    #         data[-2]['cost'], data[-1]['rest'])
-    # else:
-    #     text = '数据未更新(￣_￣|||)'
-
-    # 详细内容的文本
-
     # 表头
     desp = describe + '\n\n'
     # 出于Sever酱的markdown表格样式问题，首行表格空格为全角空格
