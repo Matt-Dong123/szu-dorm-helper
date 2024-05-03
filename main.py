@@ -36,14 +36,13 @@ def main():
     print('[爬取数据结束]')
 
     # 处理数据
-    data = processingData(table_data)
+    data = processingData(table_data)[::-1]
     print('[数据处理结束]')
     # 在控制台格式化输出爬虫获得的数据
-    sent_str = printData(data)
+    printData(data)
 
-    print(sent_str)
     if (email_config['send_email'] == True):
-        sc_sender.email_handle(email_config, data, sent_str)
+        sc_sender.email_handle(email_config, data)
         print('[已发送至邮箱]')
 
     # 若 sc_key 存在，则发送微信提醒
@@ -64,7 +63,8 @@ def main():
     today_date = datetime.date.today()
     next_day_date = today_date + datetime.timedelta(days=1)
     next_exec_time = datetime.datetime.combine(
-        next_day_date, datetime.time(hour=remind_time))
+        next_day_date, datetime.time(hour=remind_time)
+    )
     delta_time = (next_exec_time - datetime.datetime.now()).total_seconds()
     print(f'下次查询电量的时间：{next_exec_time}')
     time.sleep(delta_time)
@@ -102,19 +102,15 @@ def processingData(table_data: list):
 
 # 格式化输出爬虫获得的数据
 def printData(data: list):
-    head = ['日期'.ljust(8, ' '), '当日用电'.ljust(8, ' '), '可用电量'.ljust(8, ' '), '当日充电'.ljust(8, ' ')]
-    tmp = []
+    print('日期'.ljust(8, ' '), '当日用电'.ljust(8, ' '), '可用电量'.ljust(8, ' '), '当日充电'.ljust(8, ' '))
     for row in data:
-        cur = ""
         for datum in row:
             value = row[datum]
-            # float型要转换为str才可以使用ljust函数
             if isinstance(value, float):
                 value = '{:.2f}'.format(value)
-            cur += value.ljust(12, ' ')
-        tmp.append(cur)
-    tmp.reverse()
-    return "".join(head) + '\n' + '\n'.join(tmp)
+            print(value.ljust(12, ' '), end='')
+        print()
+    return
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import time
 from email.mime.text import MIMEText
 
 import requests
+from tabulate import tabulate
 
 # 不用代理
 os.environ['NO_PROXY'] = 'https://sc.ftqq.com/'
@@ -44,8 +45,6 @@ def handle(data: list, describe: str):
                 desp += '| {} '.format(line[datum])
         desp += '|\n'
 
-    # print(desp)  # 测试用
-
     data = {
         'text': text,
         'desp': desp
@@ -54,16 +53,29 @@ def handle(data: list, describe: str):
     return data
 
 
-def email_handle(email_config: dict, data: list, describe: str):
+def email_handle(email_config: dict, data: list):
     # 第三方 SMTP 服务
     mail_host = email_config["mail_host"]  # 设置服务器
     mail_user = email_config["mail_user"]
     mail_pass = email_config["mail_pass"]
     receivers = email_config["receivers"]
+
+    table_data = [['日期', '当日用电', '可用电量', '当日充电']]
+    for da in data:
+        tmp = []
+        for datum in da:
+            if isinstance(da[datum], float):
+                tmp.append('{:.2f}'.format(da[datum]))
+            else:
+                tmp.append(da[datum])
+        table_data.append(tmp)
+    table_html = tabulate(table_data, headers="firstrow", tablefmt='html')
+
     # 邮件内容设置
-    message = MIMEText(describe, 'plain', 'utf-8')
+    message = MIMEText(table_html, 'html', 'utf-8')
     # 邮件主题
-    message['Subject'] = '昨日用电{:.2f}度，剩余可用{:.2f}度'.format(data[-1]['cost'], data[-1]['rest'])
+    message['Subject'] = '昨日用电{:.2f}度，剩余可用{:.2f}度'.format(data[0]['cost'], data[0]['rest'])
+    print(message['Subject'])
     # 发送方信息
     message['From'] = mail_user
 
